@@ -1,4 +1,9 @@
-# sweeper
+# 扫雷
+
+
+```
+vue从零开始手撸扫雷
+```
 
 ## Project setup
 ```
