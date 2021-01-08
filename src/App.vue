@@ -94,7 +94,7 @@
 				return mineNum
 			},
 			onclick(rowi, coli) {
-				if (this.end) {
+				if (this.end||this.grid[rowi][coli].state ==1) {
 					return
 				}
 				if (this.isfirst) {
