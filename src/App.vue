@@ -11,7 +11,7 @@
 		</div>
 	</div>
 	<div>
-		⏱：{{second}}  🚩:{{flagnum}}
+		⏱：{{second}} 🚩:{{flagnum}}
 	</div>
 	<!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
 </template>
@@ -25,7 +25,7 @@
 		},
 		data: function() {
 			return {
-				timer:'',
+				timer: '',
 			}
 		},
 		created() {
@@ -46,12 +46,12 @@
 					}
 				}
 				this.grid = grid
-				this.isfirst= true
-				this.showMine= false
-				this.end= false
+				this.isfirst = true
+				this.showMine = false
+				this.end = false
 				clearInterval(this.timer)
-				this.second=0,
-				this.flagnum=10
+				this.second = 0,
+					this.flagnum = 10
 				this.$forceUpdate()
 			},
 			setmine(rowi, coli) {
@@ -94,13 +94,14 @@
 				return mineNum
 			},
 			onclick(rowi, coli) {
-				if (this.end||this.grid[rowi][coli].state ==1) {
+				if (this.end || this.grid[rowi][coli].state == 1) {
 					return
 				}
 				if (this.isfirst) {
 					this.setmine(rowi, coli)
-					this.timer=setInterval(()=>{
+					this.timer = setInterval(() => {
 						this.second++
+						this.$forceUpdate()
 					}, 1000);
 					this.isfirst = false
 				}
@@ -120,8 +121,8 @@
 						this.autoclick0(rowi, coli)
 					}
 
-					this.$forceUpdate()
 				}
+				this.$forceUpdate()
 
 			},
 			autoclick0(rowi, coli) {
@@ -143,15 +144,13 @@
 					return
 				}
 				let state = this.grid[rowi][coli].state
-				if (state == 0){
+				if (state == 0) {
 					this.flagnum--
 					this.grid[rowi][coli].state = 1
-				}
-				else if(state == 1){
+				} else if (state == 1) {
 					this.flagnum++
 					this.grid[rowi][coli].state = 2
-				}
-				else if (state == 2){
+				} else if (state == 2) {
 					this.grid[rowi][coli].state = 0
 				}
 				this.$forceUpdate()
@@ -203,7 +202,7 @@
 		text-align: center;
 		color: #2c3e50;
 		margin-top: 60px;
-		 user-select:none;
+		user-select: none;
 	}
 
 	.grid {
