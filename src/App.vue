@@ -14,7 +14,7 @@
 		</div>
 	</div>
 	<div>
-		⏱：{{second}} 🚩:{{flagnum}}
+		⏱：{{second}}&emsp;&emsp;🚩:{{flagnum}}
 	</div>
 	<div class="difficulty" v-if="show">
 		<difficulty @difficulty="changeDifficulty" />
@@ -239,8 +239,11 @@
 
 	.state0 {
 		background-color: #42B983;
+		position: relative;
 	}
-
+	.state0 div{
+		position: absolute;
+	}
 	.state3 {
 		background-color: beige;
 	}
