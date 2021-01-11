@@ -80,9 +80,9 @@
 						rowi: Math.floor(Math.random() * this.rownum),
 						coli: Math.floor(Math.random() * this.colnum)
 					}
-					let notclick = coordinate.rowi != rowi || coordinate.coli != coli
+					let notaround = coordinate.rowi<rowi-1||coordinate.rowi>rowi+1||coordinate.coli>coli+1||coordinate.coli<coli-1
 					let nothave = JSON.stringify(coordinates).indexOf(JSON.stringify(coordinate)) == -1
-					if (notclick && nothave) {
+					if (notaround && nothave) {
 						console.log(coordinate);
 						coordinates = coordinates.concat(coordinate)
 						this.grid[coordinate.rowi][coordinate.coli].ismine = 1
