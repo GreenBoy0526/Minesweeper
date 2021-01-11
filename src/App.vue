@@ -1,5 +1,8 @@
 <template>
-	<button @click="setgrid">再来一局</button>
+	<div class="menu">
+		<button @click="showdifficulty">更改难度</button>
+		<button @click="setgrid">再来一局</button>
+	</div>
 	<div @contextmenu.prevent style="width: 100%;">
 		<div v-for="(row,rowi) in grid" class="grid">
 			<div v-for="(col,coli) in row" @click="onclick(rowi,coli)" @contextmenu.prevent="changestate(rowi,coli)" @dblclick="clickaround(rowi,coli)"
@@ -13,32 +16,48 @@
 	<div>
 		⏱：{{second}} 🚩:{{flagnum}}
 	</div>
-	<!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+	<div class="difficulty" v-if="show">
+		<difficulty @difficulty="changeDifficulty" />
+	</div>
 </template>
 
 <script>
-	// import HelloWorld from './components/HelloWorld.vue'
+	import difficulty from './components/difficulty.vue'
 	export default {
 		name: 'App',
 		components: {
-			// HelloWorld
+			difficulty
 		},
 		data: function() {
 			return {
 				timer: '',
+				rownum: 9,
+				colnum: 9,
+				minenum: 10,
+				show: false
 			}
 		},
 		created() {
 			this.setgrid()
 		},
 		methods: {
+			showdifficulty() {
+				this.show = true
+			},
+			changeDifficulty(data) {
+				this.rownum = data.rownum
+				this.colnum = data.colnum
+				this.minenum = data.minenum
+				this.show = false
+				this.setgrid()
+			},
 			setgrid() {
-				let grid = new Array(9)
-				for (var i = 0; i < 9; i++) {
+				let grid = new Array(this.rownum)
+				for (var i = 0; i < this.rownum; i++) {
 					grid[i] = []
 				}
-				for (var i = 0; i < 9; i++) {
-					for (var j = 0; j < 9; j++) {
+				for (var i = 0; i < this.rownum; i++) {
+					for (var j = 0; j < this.colnum; j++) {
 						grid[i][j] = {
 							ismine: 0,
 							state: 0, //0默认 1红旗 2问号 3翻开
@@ -51,27 +70,28 @@
 				this.end = false
 				clearInterval(this.timer)
 				this.second = 0,
-					this.flagnum = 10
+					this.flagnum = this.minenum
 				this.$forceUpdate()
 			},
 			setmine(rowi, coli) {
 				let coordinates = []
-				while (coordinates.length < 10) {
+				while (coordinates.length < this.minenum) {
 					let coordinate = {
-						rowi: Math.floor(Math.random() * 9),
-						coli: Math.floor(Math.random() * 9)
+						rowi: Math.floor(Math.random() * this.rownum),
+						coli: Math.floor(Math.random() * this.colnum)
 					}
 					let notclick = coordinate.rowi != rowi || coordinate.coli != coli
 					let nothave = JSON.stringify(coordinates).indexOf(JSON.stringify(coordinate)) == -1
 					if (notclick && nothave) {
+						console.log(coordinate);
 						coordinates = coordinates.concat(coordinate)
 						this.grid[coordinate.rowi][coordinate.coli].ismine = 1
 					}
 				}
 				this.$forceUpdate()
 				// console.log(coordinates)
-				for (var i = 0; i < 9; i++) {
-					for (var j = 0; j < 9; j++) {
+				for (var i = 0; i < this.rownum; i++) {
+					for (var j = 0; j < this.colnum; j++) {
 						this.grid[i][j].arroundnum = this.getaround(i, j)
 					}
 				}
@@ -80,9 +100,9 @@
 			getaround(rowi, coli) {
 				let mineNum = 0
 				let rowmin = rowi == 0 ? 0 : rowi - 1
-				let rowmax = rowi == 8 ? 8 : rowi + 1
+				let rowmax = rowi == this.rownum - 1 ? this.rownum - 1 : rowi + 1
 				let colmin = coli == 0 ? 0 : coli - 1
-				let colmax = coli == 8 ? 8 : coli + 1
+				let colmax = coli == this.colnum - 1 ? this.colnum - 1 : coli + 1
 
 				for (var i = rowmin; i <= rowmax; i++) {
 					for (var j = colmin; j <= colmax; j++) {
@@ -94,7 +114,7 @@
 				return mineNum
 			},
 			onclick(rowi, coli) {
-				if (this.end || this.grid[rowi][coli].state == 1) {
+				if (this.end || this.show || this.grid[rowi][coli].state == 1) {
 					return
 				}
 				if (this.isfirst) {
@@ -112,7 +132,7 @@
 					alert("boom")
 				} else {
 					this.grid[rowi][coli].state = 3
-					if (this.getopennum() == 71) {
+					if (this.getopennum() == this.colnum * this.rownum - this.minenum) {
 						this.end = true
 						clearInterval(this.timer)
 						alert("赢了")
@@ -127,9 +147,9 @@
 			},
 			autoclick0(rowi, coli) {
 				let rowmin = rowi == 0 ? 0 : rowi - 1
-				let rowmax = rowi == 8 ? 8 : rowi + 1
+				let rowmax = rowi == this.rownum - 1 ? this.rownum - 1 : rowi + 1
 				let colmin = coli == 0 ? 0 : coli - 1
-				let colmax = coli == 8 ? 8 : coli + 1
+				let colmax = coli == this.colnum - 1 ? this.colnum - 1 : coli + 1
 
 				for (var i = rowmin; i <= rowmax; i++) {
 					for (var j = colmin; j <= colmax; j++) {
@@ -140,7 +160,7 @@
 				}
 			},
 			changestate(rowi, coli) {
-				if (this.end) {
+				if (this.end||this.show) {
 					return
 				}
 				let state = this.grid[rowi][coli].state
@@ -158,9 +178,9 @@
 			clickaround(rowi, coli) {
 				let flagnum = 0
 				let rowmin = rowi == 0 ? 0 : rowi - 1
-				let rowmax = rowi == 8 ? 8 : rowi + 1
+				let rowmax = rowi == this.rownum - 1 ? this.rownum - 1 : rowi + 1
 				let colmin = coli == 0 ? 0 : coli - 1
-				let colmax = coli == 8 ? 8 : coli + 1
+				let colmax = coli == this.colnum - 1 ? this.colnum - 1 : coli + 1
 
 				for (var i = rowmin; i <= rowmax; i++) {
 					for (var j = colmin; j <= colmax; j++) {
@@ -181,8 +201,8 @@
 			},
 			getopennum() {
 				let opennum = 0
-				for (var i = 0; i < 9; i++) {
-					for (var j = 0; j < 9; j++) {
+				for (var i = 0; i < this.rownum; i++) {
+					for (var j = 0; j < this.colnum; j++) {
 						if (this.grid[i][j].state == 3) {
 							opennum++
 						}
@@ -223,5 +243,16 @@
 
 	.state3 {
 		background-color: beige;
+	}
+
+	.difficulty {
+		background-color: beige;
+		position: absolute;
+		left: calc(50% - 8rem);
+		top: 10rem;
+	}
+
+	.menu button {
+		margin: 1rem;
 	}
 </style>
